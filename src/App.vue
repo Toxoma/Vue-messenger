@@ -1,30 +1,48 @@
 <template>
-  <div id="nav">
+<div id="nav">
+    <!-- 
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
+     -->
+</div>
+<router-view />
 </template>
 
 <style>
+html,
+body,
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 98%;
+    text-align: center;
 }
 
-#nav {
-  padding: 30px;
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+input.success {
+    border: 4px solid green;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+input.error {
+    border: 4px solid red;
+}
+
+.password-text {
+    font-size: 12px;
+    text-align: left;
+    margin-left: 10px;
+}
+#changePassword .password-text{
+    margin-left: 60px;
 }
 </style>
