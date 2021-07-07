@@ -6,8 +6,8 @@
                 </div>
                 <div class="user-info">
                     <div class="main-info">
-                        <p class="name">Иван Иванов</p>
-                        <p class="msg">спасибо</p>
+                        <p class="name">{{info.firstName}} {{info.lastName}}</p>
+                        <p class="msg">{{info.msg}}</p>
                     </div>
                     <div class="dop-info">
                         <div class="time">

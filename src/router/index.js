@@ -8,8 +8,8 @@ const routes = [
     component: Welcome
   },
   {
-    path: '/autorize',
-    name: 'Autorize',
+    path: '/login',
+    name: 'Login',
     component: () => import('../views/Autorize.vue')
   },
   {
@@ -28,6 +28,12 @@ const routes = [
     path: '/mainPage',
     name: 'MainPage',
     component: () => import('../views//MainPage.vue')
+  }
+  ,
+  {
+    path: '/new-password',
+    name: 'NewPassword',
+    component: () => import('../views//NewPassword.vue')
   }
   
 ]

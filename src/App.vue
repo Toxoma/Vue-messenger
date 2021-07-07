@@ -1,10 +1,5 @@
 <template>
-<div id="nav">
-    <!-- 
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-     -->
-</div>
+
 <router-view />
 </template>
 
@@ -17,6 +12,7 @@ body,
     width: 100%;
     height: 98%;
     text-align: center;
+    min-width: 690px;
 }
 
 #app {
@@ -44,5 +40,11 @@ input.error {
 }
 #changePassword .password-text{
     margin-left: 60px;
+}
+input:focus{
+    outline: none;
+}
+.popup-wrapp{
+        min-width: 690px;
 }
 </style>

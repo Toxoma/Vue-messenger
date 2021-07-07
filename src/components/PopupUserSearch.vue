@@ -2,7 +2,7 @@
 <div class="popup-wrapp">
     <div class="block d-flex flex-column">
         <div class="row1 d-flex justify-content-between">
-            <div class="">Поиск контакта</div>
+            <div class="">Добавление контакта</div>
             <img src="../assets/foto/mainPage/close.svg" @click="$emit('cancel', !flag)">
         </div>
 

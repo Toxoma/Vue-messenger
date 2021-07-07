@@ -1,5 +1,7 @@
-import { createStore } from 'vuex'
-import chats from "./db"
+import { createStore } from 'vuex';
+import chats from "./db";
+// import auth from "./auth";
+// import user from "./user";
 
 export default createStore({
   state: {
@@ -9,6 +11,8 @@ export default createStore({
   actions: {
   },
   modules: {
-    chats
+    chats,
+    // user,
+    // auth,
   }
-})
+});

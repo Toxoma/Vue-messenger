@@ -6,13 +6,12 @@
                 return false;
             }
             const inputs = Array.from(e.target.querySelectorAll('input'));
-            
+            let arr = {};
             inputs.forEach(input => {
-                _this.userData[input.dataset.key] = input.value;
-            })
-            console.log(_this.userData);
+                arr[input.dataset.key]= input.value;
+            });
             clear(_this.info);
-            return true;
+            return arr;
         }
 
         export default submitForm;

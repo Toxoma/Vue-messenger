@@ -1,6 +1,6 @@
 <template>
 <div class="reg-wrapp ">
-    <div class="reg-info" v-if="congratulationsFlag">
+    <div class="reg-info" v-if="!congratulationsFlag">
         <form class="registration-form" id="regForm" @submit.prevent="submit">
             <div class="first" v-show="flag">
                 <div class="reg-foto-block">
@@ -8,11 +8,11 @@
                 </div>
 
                 <div class="reg-name">
-                    <input data-key="firstName" data-valid="name" class="reg-input" type="text" v-model="info.firstName" placeholder="Имя">
+                    <input data-key="name" data-valid="name" class="reg-input" type="text" v-model="info.firstName" placeholder="Имя">
                 </div>
 
                 <div class="reg-familia">
-                    <input data-key="lastName" data-valid="name" class="reg-input" type="text" v-model="info.lastName" placeholder="Фамилия">
+                    <input data-key="surname" data-valid="name" class="reg-input" type="text" v-model="info.lastName" placeholder="Фамилия">
                 </div>
 
                 <router-link @click="flag=false" class='reg-link' to="">
@@ -54,8 +54,9 @@
     </div>
     <div class="congratulations" v-else>
         <p class="congratulations-text">Поздравляем!<br>Регистрация успешно пройдена</p>
+        <p class="fw-bold fs-3">Просим вас подтвердить пароль!</p>
         <img class="congratulation-img" src="../assets/foto/registration/congratulations.svg" alt="">
-        <router-link @click="flag=false" class='reg-link' to="/">
+        <router-link @click="flag=false" class='reg-link' to="/login">
             <button class='reg-continue d-flex'>
                 <p>НАЧАТЬ</p>
                 <img src="../assets/foto/registration/arrow_back.svg">
@@ -90,25 +91,25 @@ export default {
             userData: {},
             errCount: new Set(),
             passwordFlag: true,
-            congratulationsFlag: true,
         };
     },
     computed: {
         ...mapState({
             chats: (state) => state.chats.chats,
+            congratulationsFlag: (state) => state.chats.successRegister,
         }),
     },
     methods: {
         ...mapActions({
-            postRegUserInfo: "chats/postRegUserInfo",
+            register: "chats/register",
             loadChats: "chats/loadChats",
         }),
         //извлечение данных из формы
         submit: function (e) {
             setTimeout(() => {
-                submitForm(e, this);
+                const data =  submitForm(e, this);
+                this.register(data);
             }, 500);
-            // this.congratulationsFlag = false;
         },
         //обводка инпутов 
         inputValid: data => {
@@ -142,14 +143,13 @@ export default {
                         inputsPasswords[1].classList.remove('success');
                         // inputsPasswords[1].classList.add('cancel');
                     }
-
                 });
             })
         },
     },
     mounted() {
         this.inputValid(this);
-
+        
         const valid = new Validator({
             selector: '#regForm',
             pattern: {
@@ -175,6 +175,7 @@ export default {
             }
         });
         valid.init();
+
     },
 };
 </script>

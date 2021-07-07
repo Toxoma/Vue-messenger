@@ -1,55 +1,115 @@
-import axios from "axios";
+import API_URL from "../boot/api";
+import router from '../router';
 
 const state = {
-    chats: [],
-}
-const url = 'https://jsonplaceholder.typicode.com/users';
+    chats: [{
+            id: 1,
+            firstName: 'Dan',
+            lastName: 'IsHere',
+            msg: 'one',
+        },
+        {
+            id: 2,
+            firstName: 'Ads',
+            lastName: 'Dsssss',
+            msg: 'two',
+        },
+        {
+            id: 3,
+            firstName: 'Dsaa',
+            lastName: 'Mikel',
+            msg: 'three',
+        }
+    ],
+    userInfo:{},
+    successRegister: false,
+    isLogin: false,
+};
 
 const getters = {}
 
 const actions = {
-    postRegUserInfo(data) {     
-        axios.post(url, data)
-            .then(response => {
-                console.log('Ответ сервера успешно получен!');
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    },
-    postAuthUserInfo(data) {       
-        axios.post(url, data)
-            .then(response => {
-                console.log('Ответ сервера успешно получен!');
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    },
-    loadChats({
+    register({
         commit
-    },data) {
+    }, data) {
         return new Promise((resolve, reject) => {
-            axios
-                .get(url,data)
-                .then(response => {
-                    commit("SET_CHATS", response.data);
+            API_URL.post("auth/register", data)
+                .then((response) => {
+                    commit("SET_IS_REGISTER");
                     resolve(response);
                 })
-                .catch(error => {
+                .catch((error) => {
                     reject(error);
                 });
-        })
+        });
     },
+    login({
+        commit
+    }, data) {
+        return new Promise((resolve, reject) => {
+            API_URL.post("auth/login", data)
+                .then((response) => {
+                    commit("SET_IS_LOGIN",response.data.user);
+                    localStorage.setItem("access_token", response.data.token);
+                    resolve(response);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
+    forgotPassword(_, data) {
+        return new Promise((resolve, reject) => {
+          API_URL.post("password/forgot", data)
+            .then((response) => {
+              resolve(response);
+            })
+            .catch((error) => {
+              console.log(error);
+              reject(error);
+            });
+        });
+      },
+      newPassword(_, data) {
+        return new Promise((resolve, reject) => {
+          API_URL.post("password/reset", data)
+            .then((response) => {
+              resolve(response);
+            })
+            .catch((error) => {
+              console.log(error);
+              reject(error);
+            });
+        });
+      },
+      logout({ commit }) {
+        return new Promise((resolve, reject) => {
+            API_URL.post("auth/logout")
+            .then((response) => {
+                localStorage.removeItem("access_token");
+                commit("SET_IS_LOGOUT");
+                router.push('/');
+                resolve(response);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+        });
+      }
 }
 
 const mutations = {
-    SET_CHATS(state, payload) {
-        state.chats = payload;
-    },
-}
+    SET_IS_LOGIN: (state, info) => {
+        state.isLogin = true;
+        state.userInfo = info;
+      },
+      SET_IS_REGISTER: (state) => {
+        state.successRegister = true;
+      },
+      SET_IS_LOGOUT: (state) => {
+        state.isLogin = false;
+      },
+};
 
 export default {
     namespaced: true,
