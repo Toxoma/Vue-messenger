@@ -44,6 +44,7 @@ p {
 
 .welcome {
   max-width: 400px;
+  height: auto;
 }
 
 .welcome-main-text {
@@ -68,7 +69,7 @@ p {
 }
 
 .preview-foto {
-  max-width: 400px;
+  max-width: 300px;
 }
 
 .welcome-rlink {

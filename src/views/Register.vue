@@ -1,6 +1,6 @@
 <template>
 <div class="reg-wrapp ">
-    <div class="reg-info" v-if="!congratulationsFlag">
+    <div class="reg-info">
         <form class="registration-form" id="regForm" @submit.prevent="submit">
             <div class="first" v-show="flag">
                 <div class="reg-foto-block">
@@ -52,17 +52,6 @@
             </svg>
         </div>
     </div>
-    <div class="congratulations" v-else>
-        <p class="congratulations-text">Поздравляем!<br>Регистрация успешно пройдена</p>
-        <p class="fw-bold fs-3">Просим вас подтвердить пароль!</p>
-        <img class="congratulation-img" src="../assets/foto/registration/congratulations.svg" alt="">
-        <router-link @click="flag=false" class='reg-link' to="/login">
-            <button class='reg-continue d-flex'>
-                <p>НАЧАТЬ</p>
-                <img src="../assets/foto/registration/arrow_back.svg">
-            </button>
-        </router-link>
-    </div>
 </div>
 </template>
 
@@ -75,7 +64,7 @@ import {
     mapState,
     mapActions
 } from "vuex";
-
+    
 export default {
     data() {
         return {
@@ -96,7 +85,7 @@ export default {
     computed: {
         ...mapState({
             chats: (state) => state.chats.chats,
-            congratulationsFlag: (state) => state.chats.successRegister,
+            // congratulationsFlag: (state) => state.chats.successRegister,
         }),
     },
     methods: {

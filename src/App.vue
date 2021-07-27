@@ -10,7 +10,7 @@ body,
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 98%;
+    height: 100%;
     text-align: center;
     min-width: 690px;
 }

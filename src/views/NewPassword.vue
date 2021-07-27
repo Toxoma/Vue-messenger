@@ -8,27 +8,29 @@
       <form
         id="newPassword"
         class="d-flex flex-column"
-        @submit.prevent="sendNewPassword"
+        @submit.prevent="checkError"
       >
-        <input
-          class="first-inp"
-          data-key="password"
-          data-valid="password"
-          v-model="info.password"
-          type="password"
-          placeholder="Введите пароль"
-        />
-
-        <input
-          class="second-inp"
-          data-key="passwordConfirm"
-          data-valid="password_confirmation"
-          v-model="info.passwordConfirm"
-          :disabled="passwordFlag"
-          type="password"
-          placeholder="Повторите пароль"
-        />
-
+        <div class="d-flex flex-column add-padding">
+          <input
+            class="first-inp"
+            data-key="password"
+            data-valid="password"
+            v-model="info.password"
+            type="password"
+            placeholder="Введите пароль"
+          />
+        </div>
+        <div class="d-flex flex-column add-padding">
+          <input
+            class="second-inp"
+            data-key="passwordConfirm"
+            data-valid="password"
+            v-model="info.passwordConfirm"
+            :disabled="passwordFlag"
+            type="password"
+            placeholder="Повторите пароль"
+          />
+        </div>
         <button
           class="btn"
           :class="{ 'disable-block': errCount.size !== 0 }"
@@ -64,33 +66,38 @@ export default {
       newPassword: "chats/newPassword",
     }),
 
-    // submit: function (e) {
-    //   setTimeout(() => {
-    //     const data = submitForm(e, this);
-    //     this.newPassword(data);
-    //   }, 500);
-    // },
-
-    sendNewPassword() {
-      this.newPassword({
-        token: this.info.token,
-        email: this.info.email,
-        password: this.info.password,
-        password_confirmation: this.info.passwordConfirm,
-      }).then(() => {
-        console.log("Пароль сменен");
-        this.$router.push("/login");
-      });
+    checkError () {
+      if (!document.querySelector(".error")) {
+        this.sendNewPassword();
+      } else {
+        console.error("Неверные данные");
+      }
     },
 
-    inputValid: (data) => {
-      const inputsPassword = document.querySelector(".first-inp");
-      inputsPassword.addEventListener("change", () => {
-        if (data.info.password !== "") {
-          data.passwordFlag = false;
+    sendNewPassword () {
+        this.newPassword({
+          token: this.info.token,
+          email: this.info.email,
+          password: this.info.password,
+          password_confirmation: this.info.passwordConfirm,
+        }).then(() => {
+          console.log("Пароль сменен");
+          this.$router.push("/login");
+        });
+    },
+
+    inputValid: (_this) => {
+      const firstInputPassword = document.querySelector(".first-inp");
+      const secondInputsPassword = document.querySelector(".second-inp");
+
+      firstInputPassword.addEventListener("change", () => {
+        if (_this.info.password !== "") {
+          _this.passwordFlag = false;
         } else {
-          data.passwordFlag = true;
-          data.info.passwordConfirm = "";
+          _this.passwordFlag = true;
+          _this.info.passwordConfirm = "";
+          secondInputsPassword.classList.remove("success");
+          secondInputsPassword.classList.remove("error");
         }
       });
     },
@@ -123,13 +130,15 @@ export default {
   padding: 24px 32px;
   background: rgba(196, 196, 196, 0.4);
 }
+.add-padding {
+  margin: 0 60px;
+}
 
 input {
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.71);
   box-sizing: border-box;
   border-radius: 10px;
-  margin: 0 60px;
   padding: 20px 17px;
 }
 .first-inp {

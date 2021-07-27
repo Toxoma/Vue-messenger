@@ -34,6 +34,11 @@ const routes = [
     path: '/new-password',
     name: 'NewPassword',
     component: () => import('../views//NewPassword.vue')
+  },
+  {
+    path: '/congratulation',
+    name: 'Congratulation',
+    component: () => import('../views//Congratulation.vue')
   }
   
 ]

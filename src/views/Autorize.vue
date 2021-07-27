@@ -54,8 +54,6 @@
 </template>
 
 <script>
-// import router from "../router";
-// import inputValid from "../modules/inputValid";
 import submitForm from "../modules/submitForm";
 import Validator from "../modules/validator";
 
@@ -100,7 +98,7 @@ export default {
     },
   },
   mounted() {
-      if (localStorage.getItem('access_token')) {
+      if (localStorage.getItem('access_token') && localStorage.getItem('access_token')!=='undefined') {
         router.push('/mainPage');
       }
 

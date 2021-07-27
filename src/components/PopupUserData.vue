@@ -7,7 +7,7 @@
       </div>
       <form id="profile" @submit.prevent="vivod">
         <div class="row2">
-          <img :src="require('../assets/foto/mainPage/' + info.img)" />
+          <img class="profile-foto" :srcset="info.avatar" alt="foto"/>
           <img
             class="icon"
             @click="fileFlag = false"
@@ -16,44 +16,45 @@
           <input
             class="file"
             :class="{ 'd-none': fileFlag }"
-            data-key="img"
-            @change="btnFlag = false"
+            data-key="avatar"
+            ref="file"
+            @change="btnFlag=false;"
             type="file"
           />
         </div>
 
         <div class="d-flex flex-column">
           <div class="row3 row-input d-flex justify-content-between">
-            <div class="">
+            <div class="inner">
               <input
                 class=""
-                data-key="firstName"
+                data-key="name"
                 data-valid="name"
-                v-model="firstName"
+                v-model="info.name"
                 type="text"
               />
             </div>
             <img src="../assets/foto/mainPage/nameIcon.svg" />
           </div>
           <div class="row4 row-input">
-            <div class="">
+            <div class="inner">
               <input
                 class=""
                 data-valid="name"
-                data-key="secondName"
-                v-model="secondName"
+                data-key="surname"
+                v-model="info.surname"
                 type="text"
               />
             </div>
           </div>
 
           <div class="row5 row-input d-flex justify-content-between">
-            <div class="">
+            <div class="inner">
               <input
                 class=""
                 data-key="email"
                 data-valid="email"
-                v-model="email"
+                v-model="info.email"
                 type="email"
               />
             </div>
@@ -63,8 +64,8 @@
           <button
             class="btn"
             :disabled="
-              info.firstName === firstName &&
-              info.secondName === secondName &&
+              info.name === name &&
+              info.surname === surname &&
               info.email === email &&
               btnFlag
             "
@@ -82,62 +83,87 @@
 // import router from '../router';
 // import submitForm from "../modules/submitForm";
 import Validator from "../modules/validator";
+import { mapState,mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      info: {
-        img: "userFoto.svg",
-        firstName: "Григорий",
-        secondName: "Потапов",
-        email: "gridsadadadasddasdadadsadshap@yandex.ru",
-      },
-      userData: {},
-      firstName: "",
-      secondName: "",
+      info: {},
+      newData: {},
+      name: "",
+      surname: "",
       email: "",
       fileFlag: true,
       btnFlag: true,
+      file:'',
+      requestFlag: false,
     };
+  },
+   computed: {
+    ...mapState({
+      profile: (state) => state.chats.profile,
+    }),
   },
   props: {
     flag: Boolean,
   },
   methods: {
-    inputValid: (data) => {
-      const inputsPassword = document.querySelector(".first-inp");
-      inputsPassword.addEventListener("change", () => {
-        if (data.info.password !== "") {
-          data.passwordFlag = false;
-        } else {
-          data.passwordFlag = true;
-          data.info.passwordConfirm = "";
-        }
-      });
+...mapActions({
+      updateProfile: "chats/updateProfile",
+      updateAvatar: "chats/updateAvatar",
+    }),
+
+    handleFileUpload(){
+      this.file = this.$refs.file.files[0];
     },
+
     vivod: function (e) {
-      const inputs = Array.from(e.target.querySelectorAll("input"));
+      const inputs = Array.from(e.target.querySelectorAll("input:not([type='file'])"));
+
+      if (!this.btnFlag) {
+        this.handleFileUpload();
+        this.updateAvatar(this.file)
+        .then(()=>{
+          this.requestFlag = true;
+        })
+        .catch((err)=>{
+          console.error(err);
+        });
+      }
 
       inputs.forEach((element) => {
-        if (element.matches(".file") && element.value) {
-          this.userData[element.dataset.key] = element.value;
-        } else {
           if (
             element.dataset.key !== "img" &&
             this[element.dataset.key] !== this.info[element.dataset.key]
           ) {
-            this.userData[element.dataset.key] = element.value;
+            this.newData[element.dataset.key] = element.value;
           }
-        }
       });
 
-      console.log("this.userData: ", this.userData);
-      document.querySelector(".row1>img").click();
+      if (Object.keys(this.newData).length) {
+        let arr = {};
+        for (const key in this.newData) {
+          arr[key] = this.newData[key];
+        }
+        this.updateProfile(arr)
+        .then(()=>{
+          this.requestFlag = true;
+        })
+        .catch((err)=>{
+          console.error(err);
+        });
+      }
+
+      setTimeout(()=>{
+        document.querySelector(".row1>img").click();
+      },500);
     },
   },
   mounted() {
-    this.firstName = this.info.firstName;
-    this.secondName = this.info.secondName;
+    this.info = JSON.parse(localStorage.getItem('profile'));
+
+    this.name = this.info.name;
+    this.surname = this.info.surname;
     this.email = this.info.email;
 
     const valid = new Validator({
@@ -225,5 +251,12 @@ input.success {
 }
 input.error {
   border: 4px solid red;
+}
+.inner{
+  display: contents;
+}
+.profile-foto{
+  border-radius: 100px;
+  width: 150px;
 }
 </style>

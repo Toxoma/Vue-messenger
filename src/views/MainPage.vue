@@ -2,12 +2,12 @@
   <div class="main-wrapp row">
     <div class="burger-menu hide col-4">
       <section class="user-info d-flex align-items-center">
-        <div class="col1">
-          <img src="../assets/foto/mainPage/Ellipse.svg" alt="" />
+        <div class="profile-avatar">
+          <img :srcset="profile.avatar" alt="foto" />
         </div>
         <div class="col2">
-          <p class="name">Иван Иванов</p>
-          <p class="msg">+7 922 654 98 71</p>
+          <p class="name">{{ profile.name }} {{ profile.surname }}</p>
+          <p class="msg">{{profile.phone}}</p>
         </div>
       </section>
       <section
@@ -67,8 +67,13 @@
     ></PopupUser>
     <PopupUserSearch
       v-if="popupUserSearchFlag"
-      v-on:cancel="popupUserSearchFlag = $event"
       :flag="popupUserSearchFlag"
+      v-on:cancel="
+        () => {
+          popupUserSearchFlag = $event;
+          reloadChats();
+        }
+      "
     ></PopupUserSearch>
     <div class="left col-4">
       <header class="header">
@@ -104,11 +109,11 @@
       <section v-if="flagChatHas" class="chat-list">
         <ChatBlock
           v-for="chat in chatsArr"
-          :key="chat.id"
+          :key="chat.chat_id"
           :info="chat"
+          v-on:selected="selectedChat($event)"
         ></ChatBlock>
       </section>
-
       <section v-else class="chat-list-none">
         <div class="text">Чатов пока нет</div>
       </section>
@@ -120,7 +125,44 @@
         src="../assets/foto/mainPage/icon.svg"
         alt=""
       />
-      <div v-else class="chat"></div>
+      <div v-else class="chat">
+        <div class="chat-header">
+          <p>
+            {{ selectedChatInfo.chat_user.surname }}
+            {{ selectedChatInfo.chat_user.name }}
+          </p>
+        </div>
+        <div class="chat-wrapp">
+        <ChatMsgs v-for="oneMsg in array" :key="oneMsg.message_id" :info="oneMsg"></ChatMsgs>
+         </div>
+        <div class="type-block d-flex align-items-center">
+          <div class="">
+            <img
+              class="type-block__insert"
+              src="../assets/foto/mainPage/msg/attach_file.svg"
+            />
+          </div>
+          <textarea
+          spellcheck="false"
+            class="type-block__input"
+            type="text"
+            placeholder="Сообщение"
+            v-model="message"
+            rows="2"
+          />
+          <div class="d-flex">
+            <img
+              class="type-block__smile"
+              src="../assets/foto/mainPage/msg/sentiment_satisfied.svg"
+            />
+            <img
+              class="type-block__send"
+              @click="msgValid"
+              src="../assets/foto/mainPage/msg/send.svg"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -132,23 +174,23 @@ import PopupExit from "../components/PopupExit.vue";
 import PopupChange from "../components/PopupChangePassword.vue";
 import PopupUser from "../components/PopupUserData.vue";
 import PopupUserSearch from "../components/PopupUserSearch.vue";
+import ChatMsgs from "../components/ChatMsgs.vue";
 
 import { mapState, mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      info: {
-        state: true,
-      },
       flagSelectChat: true,
-      flagChatHas: true,
+      flagChatHas: false,
       popupExitFlag: false,
       popupChangeFlag: false,
       popupDataFlag: false,
       popupUserSearchFlag: false,
       burgerMenu: "",
       chatsArr: [],
+      message: "",
+      array:[],
     };
   },
   components: {
@@ -157,18 +199,50 @@ export default {
     PopupChange,
     PopupUser,
     PopupUserSearch,
+    ChatMsgs,
   },
   computed: {
     ...mapState({
       chats: (state) => state.chats.chats,
-      isLogin: (state) => state.chats.isLogin,
+      profile: (state) => state.chats.profile,
+      selectedChatInfo: (state) => state.chats.selectedChat,
+      arrayMsgs: (state) => state.chats.arrayMsgs,
     }),
   },
   methods: {
     ...mapActions({
-      postAuthUserInfo: "chats/postAuthUserInfo",
-      loadChats: "chats/loadChats",
+      getProfile: "chats/profile",
+      getChats: "chats/chats",
+      getChatMsgs: "chats/getChatMsgs",
+      sendMessage: "chats/sendMessage",
     }),
+    msgValid() {
+      if (this.message.trim()!=='') {
+        this.sendMessage(
+        {
+          id: this.selectedChatInfo.chat_id,
+          msg: {message: this.message},
+        })
+        .then(()=>{
+          this.message = '';
+        });
+      }
+    },
+    selectedChat(data) {
+      this.getChatMsgs(data.chat_id).then(() => {
+        this.array = this.selectedChatInfo.messages;
+        this.array.reverse();
+        this.flagSelectChat = false;
+      });
+    },
+
+    reloadChats() {
+      this.getChats().then((response) => {
+        this.chatsArr = response.data.data;
+        this.flagChatHas = true;
+      });
+    },
+
     toggleBurger: (burgerMenu) => {
       burgerMenu.classList.toggle("hide");
 
@@ -190,6 +264,7 @@ export default {
 
     sortirovka: function (value) {
       if (!value) {
+        console.log(this.chats);
         this.chatsArr = this.chats;
         return;
       }
@@ -198,16 +273,26 @@ export default {
       const str = new RegExp(value, "i");
 
       this.chats.forEach((item) => {
-        const fullName = item.firstName + " " + item.lastName;
+        const fullName = item.chat_user.name + " " + item.chat_user.surname;
         if (str.test(fullName)) {
           arr.push(item);
         }
       });
       this.chatsArr = arr;
     },
+
+    start() {
+      this.getProfile()
+        .then(() => {
+          this.reloadChats();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
   mounted() {
-    this.chatsArr = this.chats;
+    this.start();
 
     this.burgerMenu = document.querySelector(".burger-menu");
     const menuItems = document.querySelectorAll(".menu-item");
@@ -340,6 +425,7 @@ export default {
   height: 100%;
   z-index: 1;
   transition: 1s;
+  min-width: 230px;
 }
 
 .hide {
@@ -353,6 +439,11 @@ export default {
 
 .burger-menu .col1 {
   margin-right: 8px;
+
+}
+.profile-avatar img{
+  width: 60px; 
+  margin-right: 10px;
 }
 
 .burger-menu .col2 {
@@ -403,6 +494,61 @@ export default {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.4);
+  height: auto;
+}
+.popup-wrapp .block {
+}
+.chat {
+  border-left: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  background-image: url("../assets/foto/wall.png");
+}
+.chat-header {
+  height: 48px;
+  padding-top: 8px;
+  padding-left: 16px;
+  text-align-last: left;
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.16px;
+  font-feature-settings: "pnum" on, "lnum" on;
+  color: #212121;
+  background-color: #fff;
+}
+.type-block {
+  /* height: 46px; */
+  width: 100%;
+  background-color: #fff;
+}
+.type-block__insert {
+  padding: 0 15px;
+}
+
+.type-block__input {
   height: 100%;
+  width: 100%;
+  min-height: 35px;
+  max-height: 220px;
+  font-size: 14px;
+  border: none;
+  border-bottom: 1px solid #000;
+}
+
+.type-block__smile {
+  padding: 0 15px;
+}
+.type-block__send {
+  padding-right: 15px;
+}
+.chat-wrapp {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

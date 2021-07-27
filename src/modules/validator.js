@@ -48,7 +48,6 @@ class Validator {
 
         if (this.method) {
             const method = this.method[elem.dataset.valid];
-
             if (method) {
                 return method.every(item => validatorMethod[item[0]](elem, this.pattern[item[1]]));
             }
@@ -65,7 +64,6 @@ class Validator {
         if (document.querySelector('.password-text')) {
             document.querySelector('.password-text').remove();
         }
-
         if (this.isValid(target)) {
             this.showSuccess(target);
             this.error.delete(target);
@@ -117,7 +115,7 @@ class Validator {
             this.pattern.message = /[а-я\d]+/i;
         }
         if (!this.pattern.phone) {
-            this.pattern.phone = /^\+7921\d{7}/;
+            this.pattern.phone = /^\+79\d{9}/;
         }
         if (!this.pattern.email) {
             this.pattern.email = /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;

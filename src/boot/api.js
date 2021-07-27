@@ -7,8 +7,7 @@ import router from '../router';
 
 createApp({}).use(VueAxios, axios);
 
-export const BASE_URL = "https://test.agrides.ru/";
-// export const BASE_URL = "https://bughunt.gesekhub.ru/";
+export const BASE_URL = "https://api.agrides.ru/";
 
 export const API_URL = BASE_URL + "api/";
 
@@ -37,6 +36,7 @@ API.interceptors.request.use(
 
 API.interceptors.response.use(
   response => {
+    console.log(response.data);
     if (response.status === 200 || response.status === 201) {
       return Promise.resolve(response);
     } else {
@@ -52,13 +52,12 @@ API.interceptors.response.use(
     if (error.response.status === 403) {
       if (error.response.data.message && 
         error.response.data.message === 'Your email address is not verified.') {
-          console.log('Почта не подтверждена!');
+          console.error('Почта не подтверждена!');
+          router.push('/congratulation');
           return Promise.reject(error.response);
       }
-      console.log('1');
       return Promise.reject(error.response);
     }
-    console.log('2');
     return Promise.reject(error.response);
   }
 );

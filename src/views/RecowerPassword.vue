@@ -72,6 +72,7 @@ export default {
     submit: function (e) {
       setTimeout(() => {
         const data = submitForm(e, this);
+        console.log(data);
         this.forgotPassword(data)
           .then(()=>{
               this.flag = false
@@ -105,7 +106,6 @@ export default {
 
 .recower-wrapp {
   width: 420px;
-  height: 230px;
   margin: auto;
 }
 
